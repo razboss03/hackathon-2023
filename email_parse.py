@@ -111,7 +111,7 @@ def check_emails_period(oauth_token, check_interval, timeout, keywords):
 
 
 # Use the functions
-oauth_token = "ya29.a0AfB_byBUkF3JJyV-HgcvK5r8UHc1Ue-IAaAHOG9y-d8AB3CFRLVk0G0Mr3ZxAf_AmVYUkBE2t-r9q5EV2C_bY_feCiVqHpgaTxULHjZdcyLcv6pkIj3Erxw3F0OAnKSHsAG8BkwXLiG2OPJ7P6bGRcpAWAsFsqno6gaCgYKAdESARESFQGOcNnCq9vYPmj3rTNGF6gPs9p4qQ0169"  # Replace with your actual OAuth token
+oauth_token = "ya29.a0AfB_byCdM3wy7IchikfFsdKiGqZV60WWumqhFNjzru0QPbkIvqq4X-ivGqvBtRmX-yKRWZRT4Tqc5jRJYJ2JU56WSKdW_v4qJnaw0kUuWZBOi05BZcrvlg97x_cOTFfCiO50ic17b6EYWJytgdAb8oSZJy1vgYMvPooaCgYKAZcSARESFQGOcNnCKTuiQs3X_WkxdaH1uiYQNA0170"  # Replace with your actual OAuth token
 check_interval = 60
 timeout = 3600
 keywords = ["verification", "confirm", "welcome", "verify", "confirmation", "candidate", "email", "email address"]
@@ -122,5 +122,3 @@ if found_keyword:
    print(f"Keyword found: {found_keyword}")
 else:
    print("Keyword not found within the timeout period.")
-
-
