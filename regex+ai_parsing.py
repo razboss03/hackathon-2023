@@ -1,6 +1,8 @@
 import openai
 import re
 
+openai.api_key = "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"
+
 # Example: this is a mock function that represents fetching the email body content
 # In a real-world scenario, you need proper authentication and user consent before accessing their data
 def mock_fetch_email_content():
@@ -10,7 +12,7 @@ def mock_fetch_email_content():
     
     Please click the link below to verify your account:
     https://example.com/verify?code=12345
-    
+    a
     Thank you!
     """
 
@@ -25,7 +27,8 @@ def find_verification_link(email_content):
         # Note: In a real application, you need to handle API keys and other credentials securely
         # Also, handle rate limits, timeouts, and errors appropriately
         response = openai.ChatCompletion.create(
-          model="gpt-4.0-turbo",
+
+          model="gpt-3.5-turbo",
           messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt},

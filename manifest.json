@@ -7,7 +7,9 @@
 
     "oauth2": {
         "client_id": "39124921807-7pmtvmo1pv056nr44h9g7vop3mt8246n.apps.googleusercontent.com",
-        "scopes": ["https://www.googleapis.com/auth/contacts.readonly"]
+        "scopes": ["https://www.googleapis.com/auth/contacts.readonly",
+                  "https://www.googleapis.com/auth/gmail.readonly"
+                  ]
       },
       
 
