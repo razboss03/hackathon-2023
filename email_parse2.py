@@ -79,16 +79,21 @@ def parse_email_for_keywords(email_data, keywords):
 
 
 # Function to find the confirmation link in the email body
-def find_confirmation_link(email_body):
+def gen_links_list(email_body):
     # parser = LinkParser()
     # parser.feed(email_body)
     # return getattr(parser, "link", None)
+    links = []
     soup = BeautifulSoup(email_body, 'html.parser')
     all_links = soup.find_all('a')
     for link in all_links:
         href = link.get('href')
         if href:
-            print(href)
+            links.append(href)
+    return links
+
+def find_conf_link(links):
+
 
 
 # Function to periodically check emails for keywords
@@ -107,7 +112,8 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
                     if keyword_count > most_keywords_found:
                         most_keywords_found = keyword_count
                         best_match = email_data
-                        confirmation_link = find_confirmation_link(email_body)
+                        confirmation_links = gen_links_list(email_body)
+                        print(confirmation_links)
 
                         # If we have found a good match, return the details
                         if most_keywords_found > 0:
@@ -120,9 +126,8 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
                             return {
                                 "email_address": from_email,
                                 "subject": subject,
-                                "confirmation_link": confirmation_link
+                                "confirmation_link": confirmation_links
                             }
-                        print(email_body)
 
         # Check if the timeout has been reached
         if time.time() - start_time > timeout:
@@ -140,9 +145,8 @@ keywords = ["confirmation", "verify", "subscribe", "candidate", "email address"]
 
 email_details = check_emails_for_keywords(oauth_token, check_interval, timeout, keywords)
 if email_details:
-    # print(f"Email address: {email_details['email_address']}")
-    # print(f"Subject: {email_details['subject']}")
-    # print(f"Confirmation link: {email_details['confirmation_link']}")
-    print()
+    print(f"Email address: {email_details['email_address']}")
+    print(f"Subject: {email_details['subject']}")
+    print(f"Confirmation link: {email_details['confirmation_link']}")
 else:
     print("No email was found with the specified keywords within the timeout period.")
