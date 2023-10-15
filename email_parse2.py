@@ -3,7 +3,10 @@ import base64
 import time
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
+import openai
+import webbrowser
 
+openai.api_key = "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"
 
 # Custom HTML parser to find links
 # class LinkParser(HTMLParser):
@@ -92,7 +95,34 @@ def gen_links_list(email_body):
             links.append(href)
     return links
 
-def find_conf_link(links):
+    # Function to check if a URL is a verification link
+
+
+def is_verification_link(urls,email_body):
+    # Construct the prompt
+    prompt = "Determine if the following email has a verification link, and if so, what it is:";
+    prompt += email_body
+    prompt += "Desired format: Yes/no, the verification link is: "
+
+    # Call the OpenAI API
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo-instruct",
+        prompt=prompt,
+        max_tokens=300,
+    )
+    print(response)
+    output_text = response.choices[0].text.strip()
+    print("Output text" + output_text)
+
+    for line in output_text.split('\n'):
+        if "verification" in line.lower():
+            url = line.split()[-1]
+            print("URL:" + url)
+            return url
+
+
+
+
 
 
 
@@ -126,7 +156,8 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
                             return {
                                 "email_address": from_email,
                                 "subject": subject,
-                                "confirmation_link": confirmation_links
+                                "confirmation_link": is_verification_link(confirmation_links,email_body)
+
                             }
 
         # Check if the timeout has been reached
@@ -138,7 +169,10 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
 
 
 # Usage
-oauth_token = "ya29.a0AfB_byCdM3wy7IchikfFsdKiGqZV60WWumqhFNjzru0QPbkIvqq4X-ivGqvBtRmX-yKRWZRT4Tqc5jRJYJ2JU56WSKdW_v4qJnaw0kUuWZBOi05BZcrvlg97x_cOTFfCiO50ic17b6EYWJytgdAb8oSZJy1vgYMvPooaCgYKAZcSARESFQGOcNnCKTuiQs3X_WkxdaH1uiYQNA0170"  # Replace with your actual OAuth token
+
+# Your OpenAI API Key, ensure this is kept secure
+
+oauth_token = "ya29.a0AfB_byAg3ZmRyCSGhEuIBnG_S8XhZ2qoO5WLYp4Jxy_y7g-vdRKoVSYcrJfsnDDffrjp7fo0s1DIAa5EsgtBulk3Wa8niX1sYW86elCJEfM2_sTw5HEP7EU8EdHBuIN0PpuonBvWU1XXUAqg77Iv31rUL2_9WODpfmcaCgYKAYcSARESFQGOcNnCETR1M4NMNI45UC7I2foboQ0170"  # Replace with your actual OAuth token
 check_interval = 60  # seconds
 timeout = 3600  # 1 hour, for example
 keywords = ["confirmation", "verify", "subscribe", "candidate", "email address"]  # Keywords to look for
@@ -148,5 +182,7 @@ if email_details:
     print(f"Email address: {email_details['email_address']}")
     print(f"Subject: {email_details['subject']}")
     print(f"Confirmation link: {email_details['confirmation_link']}")
+    if(email_details['confirmation_link'] != "None"):
+        webbrowser.open_new_tab(email_details['confirmation_link'])
 else:
     print("No email was found with the specified keywords within the timeout period.")
