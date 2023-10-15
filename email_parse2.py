@@ -2,14 +2,16 @@ import requests
 import base64
 import time
 from html.parser import HTMLParser
+from bs4 import BeautifulSoup
+
 
 # Custom HTML parser to find links
-class LinkParser(HTMLParser):
-    def handle_starttag(self, tag, attrs):
-        if tag == 'a':
-            for attr in attrs:
-                if attr[0] == 'href':
-                    self.link = attr[1]
+# class LinkParser(HTMLParser):
+#     def handle_starttag(self, tag, attrs):
+#         if tag == 'a':
+#             for attr in attrs:
+#                 if attr[0] == 'href':
+#                     self.link = attr[1]
 
 
 def list_emails(oauth_token):
@@ -38,7 +40,6 @@ def list_emails(oauth_token):
         return None
 
 
-
 # Function to get the full email details
 def get_email_details(oauth_token, email_id):
     # Set up the API endpoint
@@ -58,6 +59,7 @@ def get_email_details(oauth_token, email_id):
     else:
         return None
 
+
 # Function to decode email parts
 def decode_email_parts(parts):
     email_body = ""
@@ -69,16 +71,25 @@ def decode_email_parts(parts):
                 email_body += decode_email_parts(part['parts'])
     return email_body
 
+
 # Function to parse the email details for keywords and return the count
 def parse_email_for_keywords(email_data, keywords):
     email_body = decode_email_parts(email_data.get('payload', {}).get('parts', []))
     return sum(keyword in email_body for keyword in keywords), email_body
 
+
 # Function to find the confirmation link in the email body
 def find_confirmation_link(email_body):
-    parser = LinkParser()
-    parser.feed(email_body)
-    return getattr(parser, "link", None)
+    # parser = LinkParser()
+    # parser.feed(email_body)
+    # return getattr(parser, "link", None)
+    soup = BeautifulSoup(email_body, 'html.parser')
+    all_links = soup.find_all('a')
+    for link in all_links:
+        href = link.get('href')
+        if href:
+            print(href)
+
 
 # Function to periodically check emails for keywords
 def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
@@ -102,6 +113,8 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
                         if most_keywords_found > 0:
                             headers = best_match['payload']['headers']
                             subject = next(header['value'] for header in headers if header['name'].lower() == 'subject')
+                            time2 = next(header['value'] for header in headers if header['name'].lower() == 'received')
+                            # print(time2)
                             from_email = next(header['value'] for header in headers if header['name'].lower() == 'from')
 
                             return {
@@ -109,6 +122,7 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
                                 "subject": subject,
                                 "confirmation_link": confirmation_link
                             }
+                        print(email_body)
 
         # Check if the timeout has been reached
         if time.time() - start_time > timeout:
@@ -117,16 +131,18 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
         # Wait for the specified interval before checking again
         time.sleep(check_interval)
 
+
 # Usage
-oauth_token = "ya29.a0AfB_byBUkF3JJyV-HgcvK5r8UHc1Ue-IAaAHOG9y-d8AB3CFRLVk0G0Mr3ZxAf_AmVYUkBE2t-r9q5EV2C_bY_feCiVqHpgaTxULHjZdcyLcv6pkIj3Erxw3F0OAnKSHsAG8BkwXLiG2OPJ7P6bGRcpAWAsFsqno6gaCgYKAdESARESFQGOcNnCq9vYPmj3rTNGF6gPs9p4qQ0169"  # Replace with your actual OAuth token
+oauth_token = "ya29.a0AfB_byCdM3wy7IchikfFsdKiGqZV60WWumqhFNjzru0QPbkIvqq4X-ivGqvBtRmX-yKRWZRT4Tqc5jRJYJ2JU56WSKdW_v4qJnaw0kUuWZBOi05BZcrvlg97x_cOTFfCiO50ic17b6EYWJytgdAb8oSZJy1vgYMvPooaCgYKAZcSARESFQGOcNnCKTuiQs3X_WkxdaH1uiYQNA0170"  # Replace with your actual OAuth token
 check_interval = 60  # seconds
 timeout = 3600  # 1 hour, for example
-keywords = ["confirmation", "verify", "subscribe"]  # Keywords to look for
+keywords = ["confirmation", "verify", "subscribe", "candidate", "email address"]  # Keywords to look for
 
 email_details = check_emails_for_keywords(oauth_token, check_interval, timeout, keywords)
 if email_details:
-    print(f"Email address: {email_details['email_address']}")
-    print(f"Subject: {email_details['subject']}")
-    print(f"Confirmation link: {email_details['confirmation_link']}")
+    # print(f"Email address: {email_details['email_address']}")
+    # print(f"Subject: {email_details['subject']}")
+    # print(f"Confirmation link: {email_details['confirmation_link']}")
+    print()
 else:
     print("No email was found with the specified keywords within the timeout period.")
