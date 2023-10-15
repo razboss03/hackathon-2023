@@ -66,7 +66,7 @@ def decode_email_parts(parts):
                 email_body += base64.urlsafe_b64decode(part['body']['data']).decode('utf-8')
             elif 'parts' in part:
                 email_body += decode_email_parts(part['parts'])
-    print(email_body)
+    # print(email_body)
     return email_body
 
 
@@ -105,14 +105,14 @@ def is_verification_link(urls,email_body):
         prompt=prompt,
         max_tokens=300,
     )
-    print(response)
+    # print(response)
     output_text = response.choices[0].text.strip()
     # print("Output text" + output_text)
 
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
     for line in output_text.split('\n'):
-        print(line)
+        # print(line)
         if re.search(url_pattern, line):
             url = line.split()[-1]
             #print("URL:" + url)
@@ -142,7 +142,7 @@ def check_emails_for_keywords(oauth_token, check_interval, timeout, keywords):
                         most_keywords_found = keyword_count
                         best_match = email_data
                         confirmation_links = gen_links_list(email_body)
-                        print(confirmation_links)
+                        # print(confirmation_links)
 
                         # If we have found a good match, return the details
                         if most_keywords_found > 0:
@@ -177,7 +177,7 @@ timeout = 3600  # 1 hour, for example
 keywords = ["confirmation", "verify", "subscribe", "candidate", "email address", "check", "grant", "access"]  # Keywords to look for
 
 email_details = check_emails_for_keywords(oauth_token, check_interval, timeout, keywords)
-print(email_details)
+# print(email_details)
 # if email_details:
     # print(f"Email address: {email_details['email_address']}")
     # print(f"Subject: {email_details['subject']}")
